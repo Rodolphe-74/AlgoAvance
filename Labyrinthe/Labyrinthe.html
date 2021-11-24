@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="Case.css" media="all"/>
+    <script type="text/javascript" src="labyrinthes.js" defer></script>
+    <script type="text/javascript" src="monscript.js" defer></script>
+    <title>Title</title>
+</head>
+<body style="background-color: black">
+<h1>
+    Labyrinthe
+</h1>
+    <div class="centered">
+        <button onclick="setLab(9,0)">Afficher le Labyrinthe</button>
+    </div>
+    <div class="centered">
+        <button onclick="findEntrance()">Afficher l'entrée</button>
+    </div>
+    <div class="centered">
+        <button onclick="findNextCase(lab, startLab)">Jouer le coup suivant</button>
+    </div>
+    <div class="divMain" id="main">
+
+    </div>
+</body>
+</html>
