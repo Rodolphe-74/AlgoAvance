@@ -62,52 +62,52 @@ function findEntrance(){
 
 //============== FONCTION POUR TROUVER LA SORTIE DU LABYRINTHE ===============//
 
-async function findNextCase(labyrinthe,startLab){
-    stack.push(startLab)
-    let wallX = [-1,0,1,0]
-    let wallY = [0,1,0,-1]
-
-    while(stack.length !== 0){
-        let v = stack.pop()
-
-        if (!v.visited){
-            v.visited= true
-            if(v["exit"]){
-                while(v.parent){
-                    let parent = v.parent
-                    let currentPath = document.getElementById(parent["posX"] + "/" + parent["posY"])
-                    currentPath.style.backgroundColor = "#F1B8DF"
-                    v = v.parent
-                }
-                return
-            }
-            for(let i=0; i<wallX.length;i++){
-                if(!v["walls"][i]){
-                    for(let j=0; j<lab.length ; j++) {
-                        if(lab[j]["posX"] === v["posX"]+ wallX[i] && lab[j]["posY"] === v["posY"]+ wallY[i] ){
-                            let w = lab[j]
-                            if (!w.visited) {
-                                w.parent = v;
-                                let currentPath = document.getElementById(w["posX"] + "/" + w["posY"])
-                                currentPath.style.backgroundColor = "#9C638A"
-                                stack.push(w)
-                            }
-                        }
-                    }
-                    await new Promise (resolve => {
-                        setTimeout(() => {
-                            resolve();
-                        }, 100);
-                    });
-                }
-            }
-        }
-    }
-}
+// async function findNextCase(labyrinthe,startLab){
+//     stack.push(startLab)
+//     let wallX = [-1,0,1,0]
+//     let wallY = [0,1,0,-1]
+//
+//     while(stack.length !== 0){
+//         let v = stack.pop()
+//
+//         if (!v.visited){
+//             v.visited= true
+//             if(v["exit"]){
+//                 while(v.parent){
+//                     let parent = v.parent
+//                     let currentPath = document.getElementById(parent["posX"] + "/" + parent["posY"])
+//                     currentPath.style.backgroundColor = "#F1B8DF"
+//                     v = v.parent
+//                 }
+//                 return
+//             }
+//             for(let i=0; i<wallX.length;i++){
+//                 if(!v["walls"][i]){
+//                     for(let j=0; j<lab.length ; j++) {
+//                         if(lab[j]["posX"] === v["posX"]+ wallX[i] && lab[j]["posY"] === v["posY"]+ wallY[i] ){
+//                             let w = lab[j]
+//                             if (!w.visited) {
+//                                 w.parent = v;
+//                                 let currentPath = document.getElementById(w["posX"] + "/" + w["posY"])
+//                                 currentPath.style.backgroundColor = "#9C638A"
+//                                 stack.push(w)
+//                             }
+//                         }
+//                     }
+//                     await new Promise (resolve => {
+//                         setTimeout(() => {
+//                             resolve();
+//                         }, 100);
+//                     });
+//                 }
+//             }
+//         }
+//     }
+// }
 
 //============== FONCTION POUR TROUVER LA SORTIE DU LABYRINTHE ===============//
 
-async function findNextCaseRecursive(labyrinthe,startLab){
+function findNextCaseRecursive(labyrinthe,startLab){
 
     let wallX = [-1,0,1,0]
     let wallY = [0,1,0,-1]
@@ -135,12 +135,59 @@ async function findNextCaseRecursive(labyrinthe,startLab){
     }
 }
 
-async function showPath(path){
+function showPath(path){
 
     path.forEach((caseLab) => {
         let currentPath = document.getElementById(caseLab["posX"] + "/" + caseLab["posY"])
         currentPath.style.backgroundColor = "#F1B8DF"
     })
 }
+
+//============== FONCTION POUR TROUVER LA SORTIE DU LABYRINTHE ===============//
+
+async function findNextCaseBFS(labyrinthe,startLab){
+    let queue = [];
+    queue.push(startLab)
+    let wallX = [-1,0,1,0]
+    let wallY = [0,1,0,-1]
+
+    while(queue.length !== 0){
+        let v = queue.shift();
+        if (!v.visited){
+            v.visited= true
+            if(v["exit"]){
+                while(v.parent){
+                    let parent = v.parent
+                    let currentPath = document.getElementById(parent["posX"] + "/" + parent["posY"])
+                    currentPath.style.backgroundColor = "#F1B8DF"
+                    v = v.parent
+                }
+                return
+            }
+            for(let i=0; i<wallX.length;i++){
+                if(!v["walls"][i]){
+                    for(let j=0; j<lab.length ; j++) {
+                        if(lab[j]["posX"] === v["posX"]+ wallX[i] && lab[j]["posY"] === v["posY"]+ wallY[i] ){
+                            let w = lab[j]
+                            if (!w.visited) {
+                                w.parent = v;
+                                let currentPath = document.getElementById(w["posX"] + "/" + w["posY"])
+                                currentPath.style.backgroundColor = "#9C638A"
+                                queue.push(w)
+                            }
+                        }
+                    }
+                    await new Promise (resolve => {
+                        setTimeout(() => {
+                            resolve();
+                        }, 100);
+                    });
+                }
+            }
+        }
+    }
+}
+
+
 
 console.log(stack);
