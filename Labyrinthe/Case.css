@@ -4,12 +4,6 @@ h1{
     color:white;
 }
 
-.divMain{
-    position: absolute;
-    left: 28%;
-    top: 250px;
-}
-
 .centered{
     text-align: center;
 }
@@ -20,4 +14,15 @@ h1{
     background-color : black;
     box-sizing: border-box;
 }
+
+#main{
+    margin-top: 50px;
+}
+
+.divLine{
+    display: flex;
+    flex-direction:row;
+    justify-content: center;
+}
+
 

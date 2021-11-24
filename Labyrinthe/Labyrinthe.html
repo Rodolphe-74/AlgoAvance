@@ -12,16 +12,18 @@
     Labyrinthe
 </h1>
     <div class="centered">
-        <button onclick="setLab(9,0)">Afficher le Labyrinthe</button>
+        <button onclick="setLab(13,2)">Afficher le Labyrinthe</button>
     </div>
     <div class="centered">
-        <button onclick="findEntrance()">Afficher l'entrée</button>
+        <button onclick="findEntrance();findNextCase(lab, startLab)">Jouer le coup suivant</button>
     </div>
     <div class="centered">
-        <button onclick="findNextCase(lab, startLab)">Jouer le coup suivant</button>
+        <button onclick="findEntrance();showPath(findNextCaseRecursive(lab, startLab))">Recursif</button>
     </div>
-    <div class="divMain" id="main">
+    <div id="main">
 
     </div>
+
+
 </body>
 </html>

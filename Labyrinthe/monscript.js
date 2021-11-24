@@ -11,37 +11,38 @@ function setLab(nbCase, ex){
     let mainLabDiv = document.getElementById("main")
 
 
-    lab.forEach((caseLab) => {
-        let newDiv = document.createElement("div")
+    for(let i=0; i<nbCase; i++){
+        let divLine = document.createElement("div")
+        for(let j=0; j<lab.length; j++){
+            if(i === lab[j]["posX"]){
+                let newDiv = document.createElement("div")
+                newDiv.setAttribute("id", lab[j]["posX"] + "/" + lab[j]["posY"])
+                newDiv.className = "case"
 
-        //Definition des cases
-        newDiv.setAttribute("id",caseLab["posX"] + "/" + caseLab["posY"])
-        newDiv.style.position = "absolute"
-        newDiv.style.top = caseLab["posX"]*50 + "px"
-        newDiv.style.left = caseLab["posY"]*50 + "px"
-        newDiv.className = "case"
+                //Gestion des cases entrée et sortie
+                if(lab[j]["entrance"])
+                    newDiv.style.backgroundColor = "white"
+                if(lab[j]["exit"])
+                    newDiv.style.backgroundColor = "deepPink"
 
-        //Gestion des cases entrée et sortie
-        if(caseLab["entrance"])
-            newDiv.style.backgroundColor = "white"
-        if(caseLab["exit"])
-            newDiv.style.backgroundColor = "deepPink"
+                // Gestion des bordures
+                if(lab[j]["walls"][0])
+                    newDiv.style.borderTop = "2px solid #760651"
+                if(lab[j]["walls"][1])
+                    newDiv.style.borderRight = "2px solid #760651"
+                if(lab[j]["walls"][2])
+                    newDiv.style.borderBottom = "2px solid #760651"
+                if(lab[j]["walls"][3])
+                    newDiv.style.borderLeft = "2px solid #760651"
 
-        // Gestion des bordures
-        if(caseLab["walls"][0])
-            newDiv.style.borderTop = "2px solid #760651"
-        if(caseLab["walls"][1])
-            newDiv.style.borderRight = "2px solid #760651"
-        if(caseLab["walls"][2])
-            newDiv.style.borderBottom = "2px solid #760651"
-        if(caseLab["walls"][3])
-            newDiv.style.borderLeft = "2px solid #760651"
+                divLine.append(newDiv)
+            }
+        }
+        divLine.className = "divLine"
+        mainLabDiv.append(divLine)
+    }
 
-        //Ajout de chaque Div à la fin de la div main
-        mainLabDiv.append(newDiv)
-
-        console.log(labyrinthe[nbCase]["ex-"+ex]);
-    })
+    console.log(labyrinthe[nbCase]["ex-"+ex]);
     return lab
 }
 
@@ -56,6 +57,7 @@ function findEntrance(){
             startLab = lab[i]
         }
     }
+    return startLab
 }
 
 //============== FONCTION POUR TROUVER LA SORTIE DU LABYRINTHE ===============//
@@ -68,7 +70,7 @@ async function findNextCase(labyrinthe,startLab){
     while(stack.length !== 0){
         let v = stack.pop()
 
-        if (v.visited !== true){
+        if (!v.visited){
             v.visited= true
             if(v["exit"]){
                 while(v.parent){
@@ -101,6 +103,44 @@ async function findNextCase(labyrinthe,startLab){
             }
         }
     }
+}
+
+//============== FONCTION POUR TROUVER LA SORTIE DU LABYRINTHE ===============//
+
+async function findNextCaseRecursive(labyrinthe,startLab){
+
+    let wallX = [-1,0,1,0]
+    let wallY = [0,1,0,-1]
+    let v = startLab ;
+
+    if (!v.visited){
+        v.visited = true
+        if(v["exit"]){
+            return [v]
+        }
+        for(let i=0; i<wallX.length;i++){
+            if(!v["walls"][i]){
+                for(let j=0; j<lab.length ; j++) {
+                    if(lab[j]["posX"] === v["posX"]+ wallX[i] && lab[j]["posY"] === v["posY"]+ wallY[i] ){
+                        let w = lab[j]
+                        let currentPath = findNextCaseRecursive(labyrinthe,w)
+                        if(currentPath){
+                            currentPath.push(v);
+                            return currentPath;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+async function showPath(path){
+
+    path.forEach((caseLab) => {
+        let currentPath = document.getElementById(caseLab["posX"] + "/" + caseLab["posY"])
+        currentPath.style.backgroundColor = "#F1B8DF"
+    })
 }
 
 console.log(stack);
