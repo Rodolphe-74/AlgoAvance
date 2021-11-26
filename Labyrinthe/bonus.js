@@ -1,6 +1,9 @@
+//======================= VARIABLES GLOBALES======================//
+
 let caseVisited = [];
 let caseLab;
 let lab = [];
+let stack = [];
 
 //======================= FONCTION AFFICHAGE LABYRINTHE ======================//
 
@@ -41,6 +44,8 @@ function drawLab(nbCase){
     return lab
 }
 
+//======================= CREATION DE CASES LABYRINTHE ======================//
+
 function labCreation(dimension, startLab, exitLab) {
 
     //Construction de la grille du labyrinthe
@@ -65,37 +70,37 @@ function labCreation(dimension, startLab, exitLab) {
     }
 
     //Recherche des voisins
-    let wallX = [-1, 0, 1, 0]
-    let wallY = [0, 1, 0, -1]
-    for (let i = 0; i < dimension * dimension; i++) {
-        for (let j = 0; j < wallX.length; j++) {
-            if (0 <= lab[i]["posX"] + wallX[j] && lab[i]["posX"] + wallX[j] < dimension && 0 <= lab[i]["posY"] + wallY[j] && lab[i]["posY"] + wallY[j] < dimension) {
-                let x = lab[i]["posX"] + wallX[j]
-                let y = lab[i]["posY"] + wallY[j]
-                let position = x * dimension + y
-                lab[i].neighbours.push(position)
-            }
-        }
-    }
+    findNeighbours(dimension);
+
+    //Recherche de la position d'entrée
     let entrancePosition = 0;
     for(let i=0; i<dimension*dimension ; i++) {
         if(lab[i].entrance){
             entrancePosition = i
         }
     }
+
+    //Construction du labyrinthe
     nextNeighbour(dimension,entrancePosition);
+
+    //Représentation du labyrinthe
     drawLab(dimension)
+
     return lab
 }
+
+
+//======================= CONSTRUCTION DU LABYRINTHE ======================//
 
 function nextNeighbour(dimension,entrancePosition){
 
     let randomNeighbours = []
-    let position = 0;
 
+    // Passage de la case courante en "visited"
     lab[entrancePosition].visited = true
-    let isEqual = false
 
+    //Stockage des cases visitées
+    let isEqual = false
     if(caseVisited.length===0) {
         caseVisited.push(entrancePosition)
     }
@@ -108,105 +113,133 @@ function nextNeighbour(dimension,entrancePosition){
         caseVisited.push(entrancePosition)
     }
 
-
-    //Parcours des cases
-    if(caseVisited.length===dimension*dimension) {
+    //Fin de la récursivité une fois toutes les cases parcourues
+    if(caseVisited.length === dimension*dimension) {
+        for(let i=0; i<dimension*dimension ; i++) {
+            lab[i].visited = false
+        }
+        console.log(JSON.stringify(lab)) //Génération JSON
         return;
     }
+
+    // Pour la case courante, choix d'un voisin aléatoire
+    randomNeighbour(entrancePosition, randomNeighbours)
+
+    // Cassage des murs
+    breakWall(entrancePosition, randomNeighbours, dimension)
+}
+
+
+//======================= RECHERCHE DES VOISINS ======================//
+
+function findNeighbours(dimension) {
+    let wallX = [-1, 0, 1, 0]
+    let wallY = [0, 1, 0, -1]
+    for (let i = 0; i < dimension * dimension; i++) {
+        for (let j = 0; j < wallX.length; j++) {
+            if (0 <= lab[i]["posX"] + wallX[j] && lab[i]["posX"] + wallX[j] < dimension && 0 <= lab[i]["posY"] + wallY[j] && lab[i]["posY"] + wallY[j] < dimension) {
+                let x = lab[i]["posX"] + wallX[j]
+                let y = lab[i]["posY"] + wallY[j]
+                let position = x * dimension + y
+                lab[i].neighbours.push(position)
+            }
+        }
+    }
+}
+
+
+//======================= STOCKAGE DES VOISINS NON VISITES ======================//
+
+function randomNeighbour(entrancePosition, randomNeighbours){
     for(let i=0; i<lab[entrancePosition].neighbours.length ; i++) {
         let nbCase = lab[entrancePosition].neighbours[i]
         if(!lab[nbCase].visited){
             randomNeighbours.push(nbCase)
         }
     }
+}
+
+
+//======================= CASSAGE DES MURS ======================//
+
+function breakWall(entrancePosition, randomNeighbours, dimension){
+
+    let position;
+    let tab = [[-1,3,1],[1,1,3],[-dimension,0,2],[dimension,2,0]]
+
+    //Cassage d'un mur aléatoire dans les voisins non visités restants
     if(randomNeighbours.length>0){
         let number = Math.floor(Math.random() * randomNeighbours.length)
         position = randomNeighbours[number]
         let difference =  position - entrancePosition
 
-        if(difference === -1){
-            lab[entrancePosition].walls[3] = false
-            lab[position].walls[1] = false
-        }
-        else if(difference === 1){
-            lab[entrancePosition].walls[1] = false
-            lab[position].walls[3] = false
-        }
-        else if(difference === -dimension){
-            lab[entrancePosition].walls[0] = false
-            lab[position].walls[2] = false
-        }
-        else if(difference === dimension){
-            lab[entrancePosition].walls[2] = false
-            lab[position].walls[0] = false
+        for(let i = 0 ; i<tab.length ; i++){
+            if (difference === tab[i][0]){
+                lab[entrancePosition].walls[tab[i][1]] = false
+                lab[position].walls[tab[i][2]] = false
+            }
         }
         nextNeighbour(dimension,position)
+
+    // Si pas de voisin non visité, récupération d'une case avec au moins un voisin visité et cassage du mur entre les deux
     } else{
         for(let i=0; i<dimension*dimension ; i++) {
             if(!caseVisited.includes(i)){
-                if(caseVisited.includes(i-1) && lab[i].neighbours.includes(i-1)){
-                    lab[i].walls[3] = false
-                    lab[i-1].walls[1] = false
-                    position = i
-                    nextNeighbour(dimension,position)
-                }
-                else if(caseVisited.includes(i+1) && lab[i].neighbours.includes(i+1)){
-                    lab[i].walls[1] = false
-                    lab[i+1].walls[3] = false
-                    position = i
-                    nextNeighbour(dimension,position)
-                }
-                else if(caseVisited.includes(i-dimension) && lab[i].neighbours.includes(i-dimension)) {
-                    lab[i].walls[0] = false
-                    lab[i-dimension].walls[2] = false
-                    position = i
-                    nextNeighbour(dimension, position)
-                }
-                else if(caseVisited.includes(i+dimension) && lab[i].neighbours.includes(i+dimension)) {
-                    lab[i].walls[2] = false
-                    lab[i+dimension].walls[0] = false
-                    position = i
-                    nextNeighbour(dimension, position)
+                for(let j = 0 ; j<tab.length ; j++){
+                    if(caseVisited.includes(i+tab[j][0]) && lab[i].neighbours.includes(i+tab[j][0])){
+                        lab[i].walls[tab[j][1]] = false
+                        lab[i+tab[j][0]].walls[tab[j][2]] = false
+                        position = i
+                        return nextNeighbour(dimension,position)
+                    }
                 }
             }
         }
     }
-
 }
 
 
-// stack.push(startLab)
-// let wallX = [-1,0,1,0]
-// let wallY = [0,1,0,-1]
-//
-// while(stack.length !== 0){
-//     let v = stack.pop()
-//
-//     if (!v.visited){
-//         v.visited= true
-//         if(v["exit"]){
-//             while(v.parent){
-//                 let parent = v.parent
-//                 let currentPath = document.getElementById(parent["posX"] + "/" + parent["posY"])
-//                 currentPath.style.backgroundColor = "#F1B8DF"
-//                 v = v.parent
-//             }
-//             return
-//         }
-//         for(let i=0; i<wallX.length;i++){
-//             if(!v["walls"][i]){
-//                 for(let j=0; j<lab.length ; j++) {
-//                     if(lab[j]["posX"] === v["posX"]+ wallX[i] && lab[j]["posY"] === v["posY"]+ wallY[i] ){
-//                         let w = lab[j]
-//                         if (!w.visited) {
-//                             w.parent = v;
-//                             let currentPath = document.getElementById(w["posX"] + "/" + w["posY"])
-//                             currentPath.style.backgroundColor = "#9C638A"
-//                             stack.push(w)
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// }
+//======================= PARCOURS DU LABYRINTHE ======================//
+
+async function findNextCase(startLab){
+    stack.push(startLab)
+    let wallX = [-1,0,1,0]
+    let wallY = [0,1,0,-1]
+
+    while(stack.length !== 0){
+        let v = stack.pop()
+
+        if (!v.visited){
+            v.visited= true
+            if(v["exit"]){
+                while(v.parent){
+                    let parent = v.parent
+                    let currentPath = document.getElementById(parent["posX"] + "/" + parent["posY"])
+                    currentPath.style.backgroundColor = "#F1B8DF"
+                    v = v.parent
+                }
+                return
+            }
+            for(let i=0; i<wallX.length;i++){
+                if(!v["walls"][i]){
+                    for(let j=0; j<lab.length ; j++) {
+                        if(lab[j]["posX"] === v["posX"]+ wallX[i] && lab[j]["posY"] === v["posY"]+ wallY[i] ){
+                            let w = lab[j]
+                            if (!w.visited) {
+                                w.parent = v;
+                                let currentPath = document.getElementById(w["posX"] + "/" + w["posY"])
+                                currentPath.style.backgroundColor = "#9C638A"
+                                stack.push(w)
+                            }
+                        }
+                    }
+                    await new Promise (resolve => {
+                        setTimeout(() => {
+                            resolve();
+                        }, 50);
+                    });
+                }
+            }
+        }
+    }
+}
