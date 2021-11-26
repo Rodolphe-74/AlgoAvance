@@ -25,4 +25,72 @@ h1{
     justify-content: center;
 }
 
+.hexa1{
+    width: 0;
+    border-bottom: 30px solid #C50B8A;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+}
+.hexa2{
+    width: 104px;
+    height: 60px;
+    background-color: #C50B8A;
+    border-right: 2px solid black;
+    border-left: 2px solid black;
+}
+.hexa3{
+    width: 0;
+    border-top: 30px solid #C50B8A;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+}
+.hexa4{
+    width: 0;
+    border-bottom: 30px solid transparent;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+}
+.hexa5{
+    width: 104px;
+    height: 60px;
+    background-color: transparent;
+    border-right: 2px solid black;
+    border-left: 2px solid black;
+}
+.hexa6{
+    width: 0;
+    border-top: 30px solid transparent;
+    border-left: 52px solid transparent;
+    border-right: 52px solid transparent;
+}
+.hexagoneLine{
+    display:flex;
+    flex-direction: row;
+    margin-top:-30px;
+}
 
+.hexagoneLine2{
+    display:flex;
+    flex-direction: row;
+    margin-top:-30px;
+    margin-left:54px;
+}
+
+.hexagone{
+    display:flex;
+    flex-direction: row;
+}
+
+.hexaTopLeft{
+    transform: rotate(60deg);
+    position: absolute;
+}
+.hexaTopRight{
+    transform: rotate(120deg);
+    position: absolute;
+}
+
+#hive{
+    margin-top: 100px;
+    margin-left: 100px;
+}
