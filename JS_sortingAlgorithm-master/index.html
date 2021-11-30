@@ -82,11 +82,11 @@
             setupDisplay();
 
             // Sort csvData
-            var algo = $( "#algo-select" ).val();
+            let algo = $( "#algo-select" ).val();
             sort(algo,csvData);
 
             // Start the animated display
-            var interval = parseInt($( "#interval" ).val());
+            let interval = parseInt($( "#interval" ).val());
             clearInterval(timer);
             timer = window.setInterval(function(){ oneStep(); }, interval);
 
