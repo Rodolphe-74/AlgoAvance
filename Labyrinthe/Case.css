@@ -27,20 +27,20 @@ h1{
 
 .hexa1{
     width: 0;
-    border-bottom: 30px solid #C50B8A;
+    border-bottom: 30px solid black;
     border-left: 52px solid transparent;
     border-right: 52px solid transparent;
 }
 .hexa2{
     width: 104px;
     height: 60px;
-    background-color: #C50B8A;
-    border-right: 2px solid #C50B8A;
-    border-left: 2px solid #C50B8A;
+    background-color: black;
+    border-right: 2px solid black;
+    border-left: 2px solid black;
 }
 .hexa3{
     width: 0;
-    border-top: 30px solid #C50B8A;
+    border-top: 30px solid black;
     border-left: 52px solid transparent;
     border-right: 52px solid transparent;
 }
@@ -54,8 +54,8 @@ h1{
     width: 104px;
     height: 60px;
     background-color: transparent;
-    border-right: 2px solid #C50B8A;
-    border-left: 2px solid #C50B8A;
+    border-right: 2px solid black;
+    border-left: 2px solid black;
 }
 .hexa6{
     width: 0;
@@ -96,9 +96,48 @@ h1{
 }
 
 .borderRight{
-    border-right: 2px solid black;
+    border-right: 2px solid #C50B8A;
 }
 
 .borderLeft{
-    border-left: 2px solid black;
+    border-left: 2px solid #C50B8A;
+}
+
+
+.hexagone.entrance .hexa1{
+    border-bottom: 30px solid white;
+}
+.hexagone.entrance .hexa2{
+    background-color: white;
+}
+.hexagone.entrance .hexa3{
+    border-top: 30px solid white;
+}
+.hexagone.exit .hexa1{
+    border-bottom: 30px solid deeppink;
+}
+.hexagone.exit .hexa2{
+    background-color: deeppink;
+}
+.hexagone.exit .hexa3{
+    border-top: 30px solid deeppink;
+}
+
+.hexagone.visited .hexa1{
+    border-bottom: 30px solid rgb(156, 99, 138);
+}
+.hexagone.visited .hexa2{
+    background-color: rgb(156, 99, 138);
+}
+.hexagone.visited .hexa3{
+    border-top: 30px solid rgb(156, 99, 138);
+}
+.hexagone.bestWay .hexa1{
+    border-bottom: 30px solid rgb(241, 184, 223);
+}
+.hexagone.bestWay .hexa2{
+    background-color: rgb(241, 184, 223);
+}
+.hexagone.bestWay .hexa3{
+    border-top: 30px solid rgb(241, 184, 223);
 }

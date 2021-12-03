@@ -21,9 +21,14 @@ function drawHive(nbCase) {
         }
 
         for (let j = 0; j < nbCase; j++) {
+
             let hexagone = document.createElement("div")
             hexagone.setAttribute("id", (i * nbCase + j).toString())
             hexagone.className = "hexagone"
+            if(lab[i * nbCase + j]["entrance"])
+                hexagone.classList.add("entrance")
+            if(lab[i * nbCase + j]["exit"])
+                hexagone.classList.add("exit")
 
             let newDivTop = document.createElement("div")
             newDivTop.className = "backgroundHexa"
@@ -96,7 +101,8 @@ function labHiveCreation(dimension, startLab, exitLab) {
                     "posY": j,
                     "walls": [true, true, true, true, true, true],
                     "neighbours": [],
-                    "visited": false
+                    "visited": false,
+                    "position": i*dimension + j
                 }
             if (caseLab["posX"] * dimension + caseLab["posY"] === startLab) {
                 caseLab.entrance = true
@@ -111,16 +117,8 @@ function labHiveCreation(dimension, startLab, exitLab) {
     //Recherche des voisins
     findHiveNeighbours(dimension);
 
-    //Recherche de la position d'entrée
-    let entrancePosition = 0;
-    for(let i=0; i<dimension*dimension ; i++) {
-        if(lab[i].entrance){
-            entrancePosition = i
-        }
-    }
-
     //Construction du labyrinthe
-    nextHiveNeighbour(dimension,entrancePosition);
+    nextHiveNeighbour(dimension,startLab);
 
     //Représentation du labyrinthe
     drawHive(dimension)
@@ -132,29 +130,81 @@ function labHiveCreation(dimension, startLab, exitLab) {
 // ======================= RECHERCHE DES VOISINS ======================//
 
 function findHiveNeighbours(dimension) {
-    let wallPair = [-dimension, -(dimension-1), -1, 1, dimension, dimension +1]
-    let wallImpair = [-(dimension+1), -dimension, -1, 1, dimension-1, dimension]
+    let wallPair = [-(dimension + 1), -dimension, -1, 1, dimension - 1, dimension]
+    let wallImpair = [-dimension, -(dimension - 1), -1, 1, dimension, dimension + 1]
+
 
     for (let i = 0; i < dimension * dimension; i++) {
-        //Ligne paire
-        if(lab[i]["posX"] % 2 === 0){
-            for (let j = 0; j < wallPair.length; j++) {
-                if (0 <= i+wallPair[j] && i+wallPair[j]< dimension) {
-                    let position = i + wallPair[j]
-                    lab[i].neighbours.push(position)
+
+
+        if (lab[i]["posY"] === 0 || lab[i]["posY"] === dimension-1) {
+            for (let k = 0; k <= dimension; k++) { // Cas avec 3 voisins
+                if (k % 2 === 0 && (k * dimension === i || k * dimension - 1 === i)) {
+                    let position1 = i - dimension
+                    let position2
+                    let position3 = i + dimension
+                    if (lab[i]["posY"] === 0) {
+                        position2 = i + 1
+                    } else if (lab[i]["posY"] === dimension - 1) {
+                        position2 = i - 1
+                    }
+                    lab[i].neighbours.push(position2)
+                    if (position1 >= 0) {
+                        lab[i].neighbours.push(position1)
+                    }
+                    if (position3 < dimension * dimension) {
+                        lab[i].neighbours.push(position3)
+                    }
+                } else if (k % 2 !== 0 && (k * dimension === i || k * dimension - 1 === i)) { // Cas avec 5 voisins
+                    let position1 = i - dimension
+                    let position2
+                    let position3
+                    let position4 = i + dimension
+                    let position5
+                    if (lab[i]["posY"] === 0) {
+                        position2 = i + 1
+                        position3 = i - dimension + 1
+                        position5 = i + dimension + 1
+                    } else if (lab[i]["posY"] === dimension - 1) {
+                        position2 = i - 1
+                        position3 = i - (dimension + 1)
+                        position5 = i + dimension - 1
+                    }
+                    lab[i].neighbours.push(position2)
+                    if (position1 >= 0) {
+                        lab[i].neighbours.push(position1, position3)
+                    }
+                    if (position4 < dimension * dimension) {
+                        lab[i].neighbours.push(position4, position5)
+                    }
                 }
             }
         }
-        //ligne impaire
-        else{
-            for (let j = 0; j < wallImpair.length; j++) {
-                if (0 <= i+wallImpair[j] && i+wallImpair[j]< dimension) {
-                    let position = i + wallImpair[j]
-                    lab[i].neighbours.push(position)
+
+
+        else {
+            //Ligne paire
+            if (lab[i]["posX"] % 2 === 0) {
+                for (let j = 0; j < wallPair.length; j++) {
+
+                    if (0 <= i + wallPair[j] && i + wallPair[j] < dimension * dimension) {
+                        let position = i + wallPair[j]
+                        lab[i].neighbours.push(position)
+                    }
+                }
+            }
+            //ligne impaire
+            else {
+                for (let j = 0; j < wallImpair.length; j++) {
+                    if (0 <= i + wallImpair[j] && i + wallImpair[j] < dimension * dimension) {
+                        let position = i + wallImpair[j]
+                        lab[i].neighbours.push(position)
+                    }
                 }
             }
         }
     }
+console.log(lab)
 }
 
 
@@ -215,8 +265,8 @@ function randomHiveNeighbour(entrancePosition, randomNeighbours){
 function breakHiveWall(entrancePosition, randomNeighbours, dimension){
 
     let position;
-    let tabPair = [[-dimension,4,1],[-(dimension-1),5,2], [-1,3,0], [1,0,3], [dimension, 2,5], [dimension+1,1,4]]
-    let tabImpair = [[-(dimension+1),4,1], [-dimension,5,2], [-1,3,0], [1,0,3], [dimension-1,2,5], [dimension,1,4]]
+    let tabImpair = [[-dimension,4,1],[-(dimension-1),5,2], [-1,3,0], [1,0,3], [dimension, 2,5], [dimension+1,1,4]]
+    let tabPair = [[-(dimension+1),4,1], [-dimension,5,2], [-1,3,0], [1,0,3], [dimension-1,2,5], [dimension,1,4]]
 
     //Cassage d'un mur aléatoire dans les voisins non visités restants
     if(randomNeighbours.length>0){
@@ -224,23 +274,21 @@ function breakHiveWall(entrancePosition, randomNeighbours, dimension){
         position = randomNeighbours[number]
         let difference =  position - entrancePosition
 
-        for (let i = 0; i < dimension * dimension; i++) {
-            //Ligne paire
-            if(lab[i]["posX"] % 2 === 0){
-                for(let j = 0 ; j<tabPair.length ; j++){
-                    if (difference === tabPair[j][0]){
-                        lab[entrancePosition].walls[tabPair[j][1]] = false
-                        lab[position].walls[tabPair[j][2]] = false
-                    }
+        //Ligne paire
+        if(lab[entrancePosition]["posX"] % 2 === 0) {
+            for (let j = 0; j < tabPair.length; j++) {
+                if (difference === tabPair[j][0]) {
+                    lab[entrancePosition].walls[tabPair[j][1]] = false
+                    lab[position].walls[tabPair[j][2]] = false
                 }
             }
-            //ligne impaire
-            else{
-                for (let j = 0; j < tabImpair.length; j++) {
-                    if (difference === tabImpair[j][0]){
-                        lab[entrancePosition].walls[tabImpair[j][1]] = false
-                        lab[position].walls[tabImpair[j][2]] = false
-                    }
+        }
+        //ligne impaire
+        else{
+            for (let j = 0; j < tabImpair.length; j++) {
+                if (difference === tabImpair[j][0]){
+                    lab[entrancePosition].walls[tabImpair[j][1]] = false
+                    lab[position].walls[tabImpair[j][2]] = false
                 }
             }
         }
@@ -248,7 +296,7 @@ function breakHiveWall(entrancePosition, randomNeighbours, dimension){
         nextHiveNeighbour(dimension,position)
 
         // Si pas de voisin non visité, récupération d'une case avec au moins un voisin visité et cassage du mur entre les deux
-    } else{
+    } else {
         for(let i=0; i<dimension*dimension ; i++) {
             if(!caseVisited.includes(i)){
                 if(lab[i]["posX"] % 2 === 0){
@@ -270,6 +318,75 @@ function breakHiveWall(entrancePosition, randomNeighbours, dimension){
                             return nextHiveNeighbour(dimension,position)
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+
+//======================= PARCOURS DU LABYRINTHE ======================//
+
+async function findNextHive(startLab, dimension){
+    stack.push(lab[startLab])
+    // let wallPair = [-(dimension + 1), -dimension, -1, 1, dimension - 1, dimension]
+    let wallImpair = [1, dimension, dimension-1, -1, -dimension, -dimension-1]
+    let wallPair = [1, dimension+1 , dimension, -1, -(dimension-1), -dimension]
+
+    //let wallImpair = [-dimension, -(dimension - 1), -1, 1, dimension, dimension + 1]
+
+    while(stack.length !== 0){
+        let v = stack.pop()
+
+        if (!v.visited) {
+            v.visited = true
+            if (v["exit"]) {
+                while (v.parent) {
+                    let parent = v.parent
+                    let currentPath = document.getElementById(parent["posX"] * dimension + parent["posY"])
+                    currentPath.classList.add("bestWay")
+                    v = v.parent
+                }
+                return
+            }
+            for (let i = 0; i < wallPair.length; i++) {
+                if (v["posX"] % 2 === 0) {
+                    if (!v["walls"][i]) {
+                        for (let j = 0; j < lab.length; j++) {
+                            if (j === v.position + wallPair[i] && v.neighbours.includes(j)) { //&& j appartient à v.neighbours
+                                let w = lab[j]
+                                if (!w.visited) {
+                                    w.parent = v;
+                                    let currentPath = document.getElementById(w["position"])
+                                    currentPath.classList.add("visited")
+                                    stack.push(w)
+                                }
+                            }
+                        }
+                        await new Promise(resolve => {
+                            setTimeout(() => {
+                                resolve();
+                            }, 100);
+                        });
+                    }
+                }
+                else {
+                    for (let j = 0; j < lab.length; j++) {
+                        if (j === v.position + wallImpair[i] && v.neighbours.includes(j)) {
+                            let w = lab[j]
+                            if (!w.visited) {
+                                w.parent = v;
+                                let currentPath = document.getElementById(w["position"])
+                                currentPath.classList.add("visited")
+                                stack.push(w)
+                            }
+                        }
+                    }
+                    await new Promise(resolve => {
+                        setTimeout(() => {
+                            resolve();
+                        }, 100);
+                    });
                 }
             }
         }
